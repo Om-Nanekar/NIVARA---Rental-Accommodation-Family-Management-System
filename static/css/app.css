@@ -1,0 +1,14 @@
+body { background: #f6f7f9; color: #212529; }
+.sidebar { min-height: calc(100vh - 56px); background: #fff; border-right: 1px solid #e9ecef; }
+.sidebar .nav-link { color: #495057; border-radius: .7rem; padding: .7rem .85rem; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active { background: #212529; color: #fff; }
+.card { border: 1px solid #e9ecef; box-shadow: 0 .15rem .5rem rgba(0,0,0,.04); }
+.metric-card { border: 0; }
+.metric-label { font-size: .82rem; color: #6c757d; }
+.metric-value { font-size: 1.7rem; font-weight: 700; margin-top: .35rem; }
+.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 1.25rem; background: #f1f3f5; }
+.auth-card { width: min(430px, 100%); border-radius: 1rem; }
+.table th { white-space: nowrap; }
+.manage-panel { padding: .75rem; border: 1px solid #dee2e6; border-radius: .6rem; background: #f8f9fa; }
+.qr-image { width: min(260px, 100%); height: auto; border: 1px solid #dee2e6; border-radius: .75rem; }
+@media (max-width: 991px) { .sidebar { min-height: auto; border-right: 0; border-bottom: 1px solid #e9ecef; } }

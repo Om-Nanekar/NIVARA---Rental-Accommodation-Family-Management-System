@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h3 mb-1">Dashboard</h1><p class="text-secondary mb-0">Operational summary for {{ current_date.strftime('%d %b %Y') }}</p></div><a href="{{ url_for('families') }}" class="btn btn-dark">Allocate Family</a></div>
+<div class="row g-3 mb-4">
+{% for label, value in [('Total Rooms',counts.rooms),('Available Rooms',counts.available_rooms),('Occupied Rooms',counts.occupied_rooms),('Active Families',counts.families),('Cycles Due',counts.due_cycles),('Unpaid Bills',counts.unpaid)] %}
+<div class="col-6 col-xl-2"><div class="card metric-card h-100"><div class="card-body"><div class="metric-label">{{ label }}</div><div class="metric-value">{{ value }}</div></div></div></div>
+{% endfor %}
+<div class="col-12 col-xl-3"><div class="card metric-card h-100"><div class="card-body"><div class="metric-label">Outstanding Amount</div><div class="metric-value">{{ counts.outstanding|money }}</div></div></div></div>
+</div>
+<div class="row g-4">
+<div class="col-xl-8"><div class="card"><div class="card-header fw-semibold">Recent Bills</div><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Bill</th><th>Family</th><th>Room</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>{% for b in recent_bills %}<tr><td>#{{ b.bill_id }}</td><td>{{ b.head_name }}</td><td>{{ b.room_number }}</td><td>{{ b.total_payable|money }}</td><td><span class="badge text-bg-{% if b.payment_status=='PAID' %}success{% elif b.payment_status=='PARTIALLY_PAID' %}warning{% else %}danger{% endif %}">{{ b.payment_status }}</span></td><td><a class="btn btn-sm btn-outline-dark" href="{{ url_for('bill_detail', bill_id=b.bill_id) }}">View</a></td></tr>{% else %}<tr><td colspan="6" class="text-center text-secondary py-4">No bills generated yet.</td></tr>{% endfor %}</tbody></table></div></div></div>
+<div class="col-xl-4"><div class="card"><div class="card-header fw-semibold">Billing Cycles Due</div><div class="list-group list-group-flush">{% for f in due_families %}<a class="list-group-item list-group-item-action" href="{{ url_for('electricity') }}"><div class="d-flex justify-content-between"><strong>{{ f.head_name }}</strong><span class="badge text-bg-warning">{{ f.cycle_days }} days</span></div><small class="text-secondary">Room {{ f.room_number }} · {{ f.head_phone }}</small></a>{% else %}<div class="p-4 text-secondary">No cycles due.</div>{% endfor %}</div></div></div>
+</div>
+{% endblock %}
