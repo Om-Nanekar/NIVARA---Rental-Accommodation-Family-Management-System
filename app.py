@@ -101,9 +101,19 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
+    collected_this_month = fetch_one("""
+        SELECT COALESCE(SUM(amount_paid), 0) AS total
+        FROM payments
+        WHERE payment_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01')
+            AND payment_date < DATE_ADD(
+                DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'),
+                INTERVAL 1 MONTH
+        )
+    """)["total"]
     counts = {
         "rooms": fetch_one("SELECT COUNT(*) AS c FROM rooms")["c"],
         "available_rooms": fetch_one("SELECT COUNT(*) AS c FROM rooms WHERE status='AVAILABLE'")["c"],
+        "maintenance_rooms": fetch_one("""SELECT COUNT(*) AS c FROM rooms WHERE status = 'MAINTENANCE'""")["c"],
         "occupied_rooms": fetch_one("SELECT COUNT(*) AS c FROM rooms WHERE status='OCCUPIED'")["c"],
         "families": fetch_one("SELECT COUNT(*) AS c FROM families WHERE status='ACTIVE'")["c"],
         "due_cycles": fetch_one("""
@@ -132,6 +142,7 @@ def dashboard():
     ) p
         ON p.bill_id = b.bill_id
 """)["v"],
+        "collected_this_month": collected_this_month,
     }
     recent_bills = fetch_all("""
         SELECT b.*, f.head_name, r.room_number,

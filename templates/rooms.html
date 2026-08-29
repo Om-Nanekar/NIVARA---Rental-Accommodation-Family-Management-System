@@ -1,7 +1,181 @@
-{% extends 'base.html' %}
-{% block title %}Rooms{% endblock %}
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h3">Rooms</h1><p class="text-secondary mb-0">Manage rent, capacity and occupancy states.</p></div></div>
-<div class="card mb-4"><div class="card-header fw-semibold">Add Room</div><div class="card-body"><form method="post" class="row g-3"><input type="hidden" name="action" value="add"><div class="col-md-2"><label class="form-label">Room Number</label><input class="form-control" name="room_number" maxlength="10" required></div><div class="col-md-2"><label class="form-label">Floor</label><input class="form-control" name="floor" type="number" min="0" required></div><div class="col-md-2"><label class="form-label">Capacity</label><input class="form-control" name="capacity" type="number" min="1" required></div><div class="col-md-3"><label class="form-label">Monthly Rent</label><input class="form-control" name="current_rent" type="number" min="0" step="0.01" required></div><div class="col-md-3 d-flex align-items-end"><button class="btn btn-dark w-100">Add Room</button></div></form></div></div>
-<div class="card"><div class="card-header fw-semibold">Room Register</div><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Room</th><th>Floor</th><th>Capacity</th><th>Rent</th><th>Status</th><th>Family</th><th>Actions</th></tr></thead><tbody>{% for r in rooms %}<tr><td class="fw-semibold">{{ r.room_number }}</td><td>{{ r.floor }}</td><td>{{ r.capacity }}</td><td>{{ r.current_rent|money }}</td><td><span class="badge text-bg-{% if r.status=='AVAILABLE' %}success{% elif r.status=='OCCUPIED' %}primary{% else %}secondary{% endif %}">{{ r.status }}</span></td><td>{{ r.head_name or '—' }}</td><td><details><summary class="btn btn-sm btn-outline-dark d-inline-block">Manage</summary><div class="manage-panel mt-2"><form method="post" class="mb-2"><input type="hidden" name="action" value="update"><input type="hidden" name="room_id" value="{{ r.room_id }}"><div class="row g-2"><div class="col-3"><input class="form-control form-control-sm" name="room_number" value="{{ r.room_number }}" required></div><div class="col-2"><input class="form-control form-control-sm" name="floor" type="number" value="{{ r.floor }}" required></div><div class="col-2"><input class="form-control form-control-sm" name="capacity" type="number" value="{{ r.capacity }}" required></div><div class="col-3"><input class="form-control form-control-sm" name="current_rent" type="number" step="0.01" value="{{ r.current_rent }}" required></div><div class="col-2"><button class="btn btn-sm btn-dark w-100">Save</button></div></div></form><div class="d-flex gap-2"><form method="post"><input type="hidden" name="action" value="status"><input type="hidden" name="room_id" value="{{ r.room_id }}"><button class="btn btn-sm btn-outline-success" name="status" value="AVAILABLE">Available</button><button class="btn btn-sm btn-outline-secondary" name="status" value="MAINTENANCE">Maintenance</button></form></div></div></details></td></tr>{% else %}<tr><td colspan="7" class="text-center text-secondary py-4">No rooms found.</td></tr>{% endfor %}</tbody></table></div></div>
+{% extends 'base.html' %} {% block title %}Rooms{% endblock %} {% block content
+%}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3">Rooms</h1>
+    <p class="text-secondary mb-0">
+      Manage rent, capacity and occupancy states.
+    </p>
+  </div>
+</div>
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Add Room</div>
+  <div class="card-body">
+    <form method="post" class="row g-3">
+      <input type="hidden" name="action" value="add" />
+      <div class="col-md-2">
+        <label class="form-label">Room Number</label
+        ><input
+          class="form-control"
+          name="room_number"
+          maxlength="10"
+          required
+        />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Floor</label
+        ><input
+          class="form-control"
+          name="floor"
+          type="number"
+          min="0"
+          required
+        />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Capacity</label
+        ><input
+          class="form-control"
+          name="capacity"
+          type="number"
+          min="1"
+          required
+        />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Monthly Rent</label
+        ><input
+          class="form-control"
+          name="current_rent"
+          type="number"
+          min="0"
+          step="0.01"
+          required
+        />
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <button class="btn btn-dark w-100">Add Room</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header fw-semibold">Room Register</div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Room</th>
+          <th>Floor</th>
+          <th>Capacity</th>
+          <th>Rent</th>
+          <th>Status</th>
+          <th>Family</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rooms %}
+        <tr>
+          <td class="fw-semibold">{{ r.room_number }}</td>
+          <td>{{ r.floor }}</td>
+          <td>{{ r.capacity }}</td>
+          <td>{{ r.current_rent|money }}</td>
+          <td>
+            <span
+              class="badge text-bg-{% if r.status=='AVAILABLE' %}success{% elif r.status=='OCCUPIED' %}primary{% else %}secondary{% endif %}"
+              >{{ r.status }}</span
+            >
+          </td>
+          <td>{{ r.head_name or '—' }}</td>
+          <td>
+            <details>
+              <summary class="btn btn-sm btn-outline-dark d-inline-block">
+                Manage
+              </summary>
+              <div class="manage-panel mt-2">
+                <form method="post" class="mb-2">
+                  <input type="hidden" name="action" value="update" /><input
+                    type="hidden"
+                    name="room_id"
+                    value="{{ r.room_id }}"
+                  />
+                  <div class="row g-2">
+                    <div class="col-3">
+                      <input
+                        class="form-control form-control-sm"
+                        name="room_number"
+                        value="{{ r.room_number }}"
+                        required
+                      />
+                    </div>
+                    <div class="col-2">
+                      <input
+                        class="form-control form-control-sm"
+                        name="floor"
+                        type="number"
+                        value="{{ r.floor }}"
+                        required
+                      />
+                    </div>
+                    <div class="col-2">
+                      <input
+                        class="form-control form-control-sm"
+                        name="capacity"
+                        type="number"
+                        value="{{ r.capacity }}"
+                        required
+                      />
+                    </div>
+                    <div class="col-3">
+                      <input
+                        class="form-control form-control-sm"
+                        name="current_rent"
+                        type="number"
+                        step="0.01"
+                        value="{{ r.current_rent }}"
+                        required
+                      />
+                    </div>
+                    <div class="col-2">
+                      <button class="btn btn-sm btn-dark w-100">Save</button>
+                    </div>
+                  </div>
+                </form>
+                <div class="d-flex gap-2">
+                  <form method="post">
+                    <input type="hidden" name="action" value="status" /><input
+                      type="hidden"
+                      name="room_id"
+                      value="{{ r.room_id }}"
+                    /><button
+                      class="btn btn-sm btn-outline-success"
+                      name="status"
+                      value="AVAILABLE"
+                    >
+                      Available</button
+                    ><button
+                      class="btn btn-sm btn-outline-secondary"
+                      name="status"
+                      value="MAINTENANCE"
+                    >
+                      Maintenance
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </details>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-secondary py-4">
+            No rooms found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

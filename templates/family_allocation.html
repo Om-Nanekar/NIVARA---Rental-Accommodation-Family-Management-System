@@ -1,8 +1,132 @@
-{% extends 'base.html' %}
-{% block title %}Families{% endblock %}
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h3">Family Allocation</h1><p class="text-secondary mb-0">A family occupies one room. Additional members are recorded against the family.</p></div></div>
-<div class="card mb-4"><div class="card-header fw-semibold">Allocate Available Room</div><div class="card-body"><form method="post" id="familyForm"><div class="row g-3"><div class="col-md-4"><label class="form-label">Available Room</label><select class="form-select" name="room_id" id="room_id" required>{% for r in rooms %}<option value="{{ r.room_id }}" data-capacity="{{ r.capacity }}">Room {{ r.room_number }} · Capacity {{ r.capacity }} · {{ r.current_rent|money }}/month</option>{% else %}<option disabled>No available rooms</option>{% endfor %}</select><div class="form-text" id="capacityNote"></div></div><div class="col-md-4"><label class="form-label">Family Head Name</label><input class="form-control" name="head_name" maxlength="100" required></div><div class="col-md-4"><label class="form-label">Family Head Mobile</label><input class="form-control" name="head_phone" maxlength="15" required></div><div class="col-md-4"><label class="form-label">Move-in Date</label><input class="form-control" type="date" name="move_in_date" value="{{ current_date }}" required></div><div class="col-12"><div class="d-flex justify-content-between align-items-center mb-2"><label class="form-label mb-0">Family Members</label><button type="button" class="btn btn-sm btn-outline-dark" id="addMember">+ Add Member</button></div><div id="members"></div><div class="form-text">The family head is not duplicated here. Add other household members only.</div></div><div class="col-12"><button class="btn btn-dark" {% if not rooms %}disabled{% endif %}>Allocate Family</button></div></div></form></div></div>
-<div class="card"><div class="card-header fw-semibold">Active Families</div><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Family Head</th><th>Phone</th><th>Room</th><th>Members</th><th>Move-in</th><th>Action</th></tr></thead><tbody>{% for f in families %}<tr><td class="fw-semibold">{{ f.head_name }}</td><td>{{ f.head_phone }}</td><td>{{ f.room_number }}</td><td>{{ f.member_count }}</td><td>{{ f.move_in_date }}</td><td><form method="post" action="{{ url_for('checkout_family', family_id=f.family_id) }}" data-confirm="Check out this family? Unpaid bills will block checkout."><button class="btn btn-sm btn-outline-danger">Checkout</button></form></td></tr>{% else %}<tr><td colspan="6" class="text-center text-secondary py-4">No active families.</td></tr>{% endfor %}</tbody></table></div></div>
+{% extends 'base.html' %} {% block title %}Families{% endblock %} {% block
+content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3">Family Allocation</h1>
+    <p class="text-secondary mb-0">
+      A family occupies one room. Additional members are recorded against the
+      family.
+    </p>
+  </div>
+</div>
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Allocate Available Room</div>
+  <div class="card-body">
+    <form method="post" id="familyForm">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Available Room</label
+          ><select class="form-select" name="room_id" id="room_id" required>
+            {% for r in rooms %}
+            <option value="{{ r.room_id }}" data-capacity="{{ r.capacity }}">
+              Room {{ r.room_number }} · Capacity {{ r.capacity }} · {{
+              r.current_rent|money }}/month
+            </option>
+            {% else %}
+            <option disabled>No available rooms</option>
+            {% endfor %}
+          </select>
+          <div class="form-text" id="capacityNote"></div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Family Head Name</label
+          ><input
+            class="form-control"
+            name="head_name"
+            maxlength="100"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Family Head Mobile</label
+          ><input
+            class="form-control"
+            name="head_phone"
+            maxlength="15"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Move-in Date</label
+          ><input
+            class="form-control"
+            type="date"
+            name="move_in_date"
+            value="{{ current_date }}"
+            required
+          />
+        </div>
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label mb-0">Family Members</label
+            ><button
+              type="button"
+              class="btn btn-sm btn-outline-dark"
+              id="addMember"
+            >
+              + Add Member
+            </button>
+          </div>
+          <div id="members"></div>
+          <div class="form-text">
+            The family head is not duplicated here. Add other household members
+            only.
+          </div>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-dark" {% if not rooms %}disabled{% endif %}>
+            Allocate Family
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header fw-semibold">Active Families</div>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Family Head</th>
+          <th>Phone</th>
+          <th>Room</th>
+          <th>Members</th>
+          <th>Move-in</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in families %}
+        <tr>
+          <td class="fw-semibold">{{ f.head_name }}</td>
+          <td>{{ f.head_phone }}</td>
+          <td>{{ f.room_number }}</td>
+          <td>{{ f.member_count }}</td>
+          <td>{{ f.move_in_date }}</td>
+          <td>
+            <form
+              method="post"
+              action="{{ url_for('checkout_family', family_id=f.family_id) }}"
+              data-confirm="Check out this family? Unpaid bills will block checkout."
+            >
+              <button class="btn btn-sm btn-outline-danger">Checkout</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-secondary py-4">
+            No active families.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  window.familyCapacities = {{ rooms|map(attribute='capacity')|list|tojson }};
+</script>
 {% endblock %}
-{% block scripts %}<script>window.familyCapacities = {{ rooms|map(attribute='capacity')|list|tojson }};</script>{% endblock %}

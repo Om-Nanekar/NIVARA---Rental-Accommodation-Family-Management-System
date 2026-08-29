@@ -1,6 +1,61 @@
-{% extends 'base.html' %}
-{% block title %}Bills{% endblock %}
-{% block content %}
-<div class="mb-4"><h1 class="h3">Bills</h1><p class="text-secondary mb-0">Historical billing snapshots are independent of current room rent and electricity rate changes.</p></div>
-<div class="card"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Bill</th><th>Month</th><th>Family</th><th>Room</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th></th></tr></thead><tbody>{% for b in bills %}<tr><td>#{{ b.bill_id }}</td><td>{{ b.billing_month }}</td><td>{{ b.head_name }}</td><td>{{ b.room_number }}</td><td>{{ b.total_payable|money }}</td><td>{{ b.paid|money }}</td><td>{{ b.balance|money }}</td><td><span class="badge text-bg-{% if b.payment_status=='PAID' %}success{% elif b.payment_status=='PARTIALLY_PAID' %}warning{% else %}danger{% endif %}">{{ b.payment_status }}</span></td><td><a class="btn btn-sm btn-dark" href="{{ url_for('bill_detail', bill_id=b.bill_id) }}">Open</a></td></tr>{% else %}<tr><td colspan="9" class="text-center text-secondary py-5">No bills available.</td></tr>{% endfor %}</tbody></table></div></div>
+{% extends 'base.html' %} {% block title %}Bills{% endblock %} {% block content
+%}
+<div class="mb-4">
+  <h1 class="h3">Bills</h1>
+  <p class="text-secondary mb-0">
+    Historical billing snapshots are independent of current room rent and
+    electricity rate changes.
+  </p>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Bill</th>
+          <th>Month</th>
+          <th>Family</th>
+          <th>Room</th>
+          <th>Total</th>
+          <th>Paid</th>
+          <th>Balance</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bills %}
+        <tr>
+          <td>#{{ b.bill_id }}</td>
+          <td>{{ b.billing_month }}</td>
+          <td>{{ b.head_name }}</td>
+          <td>{{ b.room_number }}</td>
+          <td>{{ b.total_payable|money }}</td>
+          <td>{{ b.paid|money }}</td>
+          <td>{{ b.balance|money }}</td>
+          <td>
+            <span
+              class="badge text-bg-{% if b.payment_status=='PAID' %}success{% elif b.payment_status=='PARTIALLY_PAID' %}warning{% else %}danger{% endif %}"
+              >{{ b.payment_status }}</span
+            >
+          </td>
+          <td>
+            <a
+              class="btn btn-sm btn-dark"
+              href="{{ url_for('bill_detail', bill_id=b.bill_id) }}"
+              >Open</a
+            >
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="text-center text-secondary py-5">
+            No bills available.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
