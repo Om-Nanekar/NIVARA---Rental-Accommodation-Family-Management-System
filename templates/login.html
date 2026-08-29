@@ -1,31 +1,53 @@
-{% extends 'base.html' %} {% block title %}Admin Login{% endblock %} {% block
-auth_content %}
+{% extends 'base.html' %}
+
+{% block title %}Admin Sign In{% endblock %}
+
+{% block auth_content %}
 <div class="auth-page">
-  <div class="card auth-card shadow-lg border-0">
+  <div class="card auth-card">
     <div class="card-body p-4 p-md-5">
       <div class="text-center mb-4">
-        <h1 class="h3 fw-bold">Admin Login</h1>
-        <p class="text-secondary mb-0">Rental Accommodation Management</p>
+        <div class="brand-badge mx-auto mb-3 shadow" style="width: 52px; height: 52px; font-size: 1.6rem; border-radius: 12px;">
+          <i class="bi bi-building-fill-gear"></i>
+        </div>
+        <h1 class="h3 fw-bold text-dark mb-1">NIVARA Admin</h1>
+        <p class="text-secondary small mb-0">Rental Accommodation & Family Management</p>
       </div>
-      {% with messages = get_flashed_messages(with_categories=true) %} {% for
-      category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %} {% endwith %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small">
+        <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
+      </div>
+      {% endfor %}
+      {% endwith %}
+
       <form method="post" autocomplete="off">
         <div class="mb-3">
-          <label class="form-label">Username</label
-          ><input class="form-control" name="username" required autofocus />
+          <label class="form-label">Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
+            <input class="form-control" name="username" placeholder="Admin username" required autofocus />
+          </div>
         </div>
+
         <div class="mb-4">
-          <label class="form-label">Password</label
-          ><input
-            type="password"
-            class="form-control"
-            name="password"
-            required
-          />
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
+            <input
+              type="password"
+              class="form-control"
+              name="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
         </div>
-        <button class="btn btn-dark w-100">Sign in</button>
+
+        <button class="btn btn-indigo w-100 py-2 fs-6 shadow-sm">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Dashboard
+        </button>
       </form>
     </div>
   </div>

@@ -4,388 +4,257 @@
 
 {% block content %}
 
-<!-- =========================================================
-     DASHBOARD HEADER
-========================================================= -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
     <div>
-        <h1 class="h3 mb-1">Dashboard</h1>
-
-        <p class="text-secondary mb-0">
-            Operational summary for
-            {{ current_date.strftime('%d %b %Y') }}
+        <h1 class="h3 fw-bold mb-1">Dashboard Overview</h1>
+        <p class="text-secondary small mb-0">
+            <i class="bi bi-calendar-check me-1"></i> Operational summary for {{ current_date.strftime('%d %b %Y') }}
         </p>
     </div>
 
-    <a href="{{ url_for('families') }}" class="btn btn-dark">
-        Allocate Family
+    <a href="{{ url_for('families') }}" class="btn btn-indigo shadow-sm">
+        <i class="bi bi-person-plus-fill"></i> Allocate Family
     </a>
 </div>
 
-
-<!-- =========================================================
-     ROW 1 - ROOM OVERVIEW
-     4 CARDS
-========================================================= -->
+<!-- ROW 1 - ROOM OVERVIEW -->
 <div class="row g-3 mb-4">
-
     <!-- Total Rooms -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Total Rooms
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Total Rooms</div>
+                    <div class="metric-value">{{ counts.rooms }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.rooms }}
+                <div class="metric-icon-box metric-icon-blue">
+                    <i class="bi bi-door-closed-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Available Rooms -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Available Rooms
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Available Rooms</div>
+                    <div class="metric-value text-success">{{ counts.available_rooms }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.available_rooms }}
+                <div class="metric-icon-box metric-icon-emerald">
+                    <i class="bi bi-check-circle-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Occupied Rooms -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Occupied Rooms
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Occupied Rooms</div>
+                    <div class="metric-value text-primary">{{ counts.occupied_rooms }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.occupied_rooms }}
+                <div class="metric-icon-box metric-icon-indigo">
+                    <i class="bi bi-house-door-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Maintenance Rooms -->
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Maintenance Rooms
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Maintenance</div>
+                    <div class="metric-value text-muted">{{ counts.maintenance_rooms }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.maintenance_rooms }}
+                <div class="metric-icon-box metric-icon-amber">
+                    <i class="bi bi-tools"></i>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
-
-<!-- =========================================================
-     ROW 2 - FAMILY & BILLING OVERVIEW
-     3 CARDS
-========================================================= -->
+<!-- ROW 2 - FAMILY & BILLING OVERVIEW -->
 <div class="row g-3 mb-4">
-
     <!-- Active Families -->
     <div class="col-12 col-md-6 col-xl-4">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Active Families
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Active Families</div>
+                    <div class="metric-value">{{ counts.families }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.families }}
+                <div class="metric-icon-box metric-icon-blue">
+                    <i class="bi bi-people-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Billing Cycles Due -->
     <div class="col-12 col-md-6 col-xl-4">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Billing Cycles Due
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Cycles Due (&ge; 30d)</div>
+                    <div class="metric-value {% if counts.due_cycles > 0 %}text-warning{% endif %}">{{ counts.due_cycles }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.due_cycles }}
+                <div class="metric-icon-box metric-icon-amber">
+                    <i class="bi bi-alarm-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Unpaid Bills -->
     <div class="col-12 col-md-6 col-xl-4">
         <div class="card metric-card h-100">
-            <div class="card-body">
-                <div class="metric-label">
-                    Unpaid Bills
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="metric-label">Unpaid Bills</div>
+                    <div class="metric-value {% if counts.unpaid > 0 %}text-danger{% endif %}">{{ counts.unpaid }}</div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.unpaid }}
+                <div class="metric-icon-box metric-icon-rose">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
-
-<!-- =========================================================
-     ROW 3 - FINANCIAL OVERVIEW
-     2 CARDS
-========================================================= -->
+<!-- ROW 3 - FINANCIAL OVERVIEW -->
 <div class="row g-3 mb-4">
-
     <!-- Collected This Month -->
     <div class="col-12 col-xl-6">
-        <div class="card metric-card h-100">
+        <div class="card metric-card h-100 border-start border-4 border-success">
             <div class="card-body">
-
-                <div class="metric-label">
-                    Collected This Month
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="metric-label">Collected This Month</div>
+                        <div class="metric-value text-emerald fs-2">{{ counts.collected_this_month|money }}</div>
+                    </div>
+                    <div class="metric-icon-box metric-icon-emerald">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.collected_this_month|money }}
-                </div>
-
                 <div class="text-secondary small mt-2">
-                    Payments received during the current month
+                    <i class="bi bi-info-circle me-1"></i> Payments recorded during current month
                 </div>
-
             </div>
         </div>
     </div>
-
 
     <!-- Outstanding Amount -->
     <div class="col-12 col-xl-6">
-        <div class="card metric-card h-100">
+        <div class="card metric-card h-100 border-start border-4 border-danger">
             <div class="card-body">
-
-                <div class="metric-label">
-                    Outstanding Amount
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="metric-label">Outstanding Balance</div>
+                        <div class="metric-value text-rose fs-2">{{ counts.outstanding|money }}</div>
+                    </div>
+                    <div class="metric-icon-box metric-icon-rose">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
                 </div>
-
-                <div class="metric-value">
-                    {{ counts.outstanding|money }}
-                </div>
-
                 <div class="text-secondary small mt-2">
-                    Total amount currently pending
+                    <i class="bi bi-info-circle me-1"></i> Total unpaid or partial balance pending
                 </div>
-
             </div>
         </div>
     </div>
-
 </div>
 
-
-<!-- =========================================================
-     RECENT BILLS + BILLING CYCLES DUE
-========================================================= -->
+<!-- RECENT BILLS + BILLING CYCLES DUE -->
 <div class="row g-4">
-
-    <!-- =====================================================
-         RECENT BILLS
-    ====================================================== -->
+    <!-- RECENT BILLS -->
     <div class="col-xl-8">
-
         <div class="card h-100">
-
-            <div class="card-header fw-semibold">
-                Recent Bills
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-receipt me-2"></i>Recent Bills</span>
+                <a href="{{ url_for('bills') }}" class="btn btn-sm btn-outline-dark">View All</a>
             </div>
-
             <div class="table-responsive">
-
-                <table class="table align-middle mb-0">
-
+                <table class="table align-middle table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>Bill</th>
-                            <th>Family</th>
+                            <th>Bill #</th>
+                            <th>Family Head</th>
                             <th>Room</th>
-                            <th>Total</th>
+                            <th>Total Payable</th>
                             <th>Status</th>
-                            <th></th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
-
                     <tbody>
-
                         {% for b in recent_bills %}
-
                         <tr>
-
-                            <!-- Bill ID -->
+                            <td class="fw-semibold">#{{ b.bill_id }}</td>
+                            <td>{{ b.head_name }}</td>
+                            <td><span class="badge badge-soft-secondary">Room {{ b.room_number }}</span></td>
+                            <td class="fw-semibold">{{ b.total_payable|money }}</td>
                             <td>
-                                #{{ b.bill_id }}
-                            </td>
-
-
-                            <!-- Family Head -->
-                            <td>
-                                {{ b.head_name }}
-                            </td>
-
-
-                            <!-- Room -->
-                            <td>
-                                {{ b.room_number }}
-                            </td>
-
-
-                            <!-- Total -->
-                            <td>
-                                {{ b.total_payable|money }}
-                            </td>
-
-
-                            <!-- Payment Status -->
-                            <td>
-
                                 {% if b.payment_status == 'PAID' %}
-
-                                <span class="badge text-bg-success">
-                                    PAID
-                                </span>
-
+                                <span class="badge badge-soft-success"><i class="bi bi-check-circle me-1"></i>PAID</span>
                                 {% elif b.payment_status == 'PARTIALLY_PAID' %}
-
-                                <span class="badge text-bg-warning">
-                                    PARTIALLY PAID
-                                </span>
-
+                                <span class="badge badge-soft-warning"><i class="bi bi-pie-chart me-1"></i>PARTIAL</span>
                                 {% else %}
-
-                                <span class="badge text-bg-danger">
-                                    UNPAID
-                                </span>
-
+                                <span class="badge badge-soft-danger"><i class="bi bi-clock-history me-1"></i>UNPAID</span>
                                 {% endif %}
-
                             </td>
-
-
-                            <!-- View Bill -->
-                            <td>
-
-                                <a
-                                    class="btn btn-sm btn-outline-dark"
-                                    href="{{ url_for('bill_detail', bill_id=b.bill_id) }}"
-                                >
-                                    View
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-dark" href="{{ url_for('bill_detail', bill_id=b.bill_id) }}">
+                                    View <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
-
                             </td>
-
                         </tr>
-
                         {% else %}
-
                         <tr>
-
-                            <td
-                                colspan="6"
-                                class="text-center text-secondary py-4"
-                            >
+                            <td colspan="6" class="text-center text-secondary py-4">
+                                <i class="bi bi-inbox fs-3 d-block mb-1 text-muted"></i>
                                 No bills generated yet.
                             </td>
-
                         </tr>
-
                         {% endfor %}
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- =====================================================
-         BILLING CYCLES DUE
-    ====================================================== -->
+    <!-- BILLING CYCLES DUE -->
     <div class="col-xl-4">
-
         <div class="card h-100">
-
-            <div class="card-header fw-semibold">
-                Billing Cycles Due
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-fill me-2 text-warning"></i>Cycles Due for Reading</span>
             </div>
-
-
             <div class="list-group list-group-flush">
-
                 {% for f in due_families %}
-
-                <a
-                    class="list-group-item list-group-item-action"
-                    href="{{ url_for('electricity') }}"
-                >
-
-                    <div class="d-flex justify-content-between align-items-center">
-
-                        <strong>
-                            {{ f.head_name }}
-                        </strong>
-
-                        <span class="badge text-bg-warning">
-                            {{ f.cycle_days }} days
-                        </span>
-
+                <a class="list-group-item list-group-item-action p-3" href="{{ url_for('electricity') }}">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="text-dark">{{ f.head_name }}</strong>
+                        <span class="badge badge-soft-warning">{{ f.cycle_days }} days</span>
                     </div>
-
-
-                    <small class="text-secondary">
-                        Room {{ f.room_number }}
-                        ·
-                        {{ f.head_phone }}
-                    </small>
-
+                    <div class="small text-secondary">
+                        <i class="bi bi-door-open me-1"></i>Room {{ f.room_number }} · <i class="bi bi-telephone me-1"></i>{{ f.head_phone }}
+                    </div>
                 </a>
-
                 {% else %}
-
-                <div class="p-4 text-secondary">
-                    No billing cycles due.
+                <div class="p-4 text-center text-secondary">
+                    <i class="bi bi-check-all fs-2 text-success d-block mb-1"></i>
+                    All cycles are up to date!
                 </div>
-
                 {% endfor %}
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 {% endblock %}

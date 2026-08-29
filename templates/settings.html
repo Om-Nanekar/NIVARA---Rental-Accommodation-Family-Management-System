@@ -1,79 +1,103 @@
-{% extends 'base.html' %} {% block title %}Settings{% endblock %} {% block
-content %}
-<div class="mb-4">
-  <h1 class="h3">Settings</h1>
-  <p class="text-secondary mb-0">
-    Property identity, UPI details, electricity rates and admin credentials.
-  </p>
+{% extends 'base.html' %} 
+
+{% block title %}Settings{% endblock %} 
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+  <div>
+    <h1 class="h3 fw-bold mb-1">System Settings</h1>
+    <p class="text-secondary small mb-0">
+      Manage property identity, UPI payment receivers, electricity unit rates, and admin security credentials.
+    </p>
+  </div>
 </div>
+
 <div class="row g-4">
+  <!-- LEFT COLUMN: PROPERTY & UPI -->
   <div class="col-xl-6">
-    <div class="card">
-      <div class="card-header fw-semibold">Property & UPI</div>
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <i class="bi bi-building-gear me-2 text-indigo"></i>Property & UPI Payment Receiver Info
+      </div>
       <div class="card-body">
         <form method="post">
           <input type="hidden" name="action" value="property" />
           <div class="mb-3">
-            <label class="form-label">Property Name</label
-            ><input
+            <label class="form-label">Property Name</label>
+            <input
               class="form-control"
               name="property_name"
               value="{{ settings.property_name if settings else '' }}"
+              placeholder="e.g. Nivara Accommodation"
               required
             />
           </div>
           <div class="mb-3">
-            <label class="form-label">Property Contact</label
-            ><input
+            <label class="form-label">Property Contact Number / Address</label>
+            <input
               class="form-control"
               name="property_contact"
               value="{{ settings.property_contact if settings else '' }}"
+              placeholder="e.g. +91 9876543210"
               required
             />
           </div>
           <div class="mb-3">
-            <label class="form-label">UPI ID</label
-            ><input
-              class="form-control"
-              name="upi_id"
-              value="{{ settings.upi_id if settings else '' }}"
-              required
-            />
+            <label class="form-label">UPI VPA / ID</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
+              <input
+                class="form-control"
+                name="upi_id"
+                value="{{ settings.upi_id if settings else '' }}"
+                placeholder="e.g. name@upi"
+                required
+              />
+            </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">UPI Name</label
-            ><input
+          <div class="mb-4">
+            <label class="form-label">UPI Account Receiver Name</label>
+            <input
               class="form-control"
               name="upi_name"
               value="{{ settings.upi_name if settings else '' }}"
+              placeholder="Registered UPI Name"
               required
             />
           </div>
-          <button class="btn btn-dark">Save Property Settings</button>
+          <button class="btn btn-indigo w-100">
+            <i class="bi bi-save me-1"></i> Save Property & UPI Settings
+          </button>
         </form>
       </div>
     </div>
   </div>
+
+  <!-- RIGHT COLUMN: ELECTRICITY RATE & SECURITY -->
   <div class="col-xl-6">
-    <div class="card mb-4">
-      <div class="card-header fw-semibold">Add Electricity Rate</div>
+    <!-- ADD ELECTRICITY RATE -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Configure Electricity Rate
+      </div>
       <div class="card-body">
-        <form method="post" class="row g-3">
+        <form method="post" class="row g-3 align-items-end">
           <input type="hidden" name="action" value="rate" />
           <div class="col-6">
-            <label class="form-label">Rate per Unit</label
-            ><input
+            <label class="form-label">Rate per Unit (₹)</label>
+            <input
               class="form-control"
               type="number"
               min="0"
               step="0.01"
               name="rate_per_unit"
+              placeholder="0.00"
               required
             />
           </div>
           <div class="col-6">
-            <label class="form-label">Effective From</label
-            ><input
+            <label class="form-label">Effective From</label>
+            <input
               class="form-control"
               type="date"
               name="effective_from"
@@ -82,51 +106,71 @@ content %}
             />
           </div>
           <div class="col-12">
-            <button class="btn btn-dark">Add Rate</button>
+            <button class="btn btn-indigo w-100">
+              <i class="bi bi-plus-lg me-1"></i> Add New Electricity Rate
+            </button>
           </div>
         </form>
       </div>
     </div>
-    <div class="card mb-4">
-      <div class="card-header fw-semibold">Rate History</div>
+
+    <!-- RATE HISTORY -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <i class="bi bi-history me-2"></i>Electricity Rate History
+      </div>
       <div class="table-responsive">
-        <table class="table mb-0">
+        <table class="table table-hover align-middle mb-0">
           <thead>
             <tr>
-              <th>Rate</th>
-              <th>From</th>
-              <th>To</th>
+              <th>Rate / Unit</th>
+              <th>Effective From</th>
+              <th>Effective To</th>
             </tr>
           </thead>
           <tbody>
             {% for r in rates %}
             <tr>
-              <td>{{ r.rate_per_unit|money }}</td>
+              <td class="fw-bold text-dark">{{ r.rate_per_unit|money }}</td>
               <td>{{ r.effective_from }}</td>
-              <td>{{ r.effective_to or 'Current' }}</td>
+              <td>
+                {% if not r.effective_to %}
+                <span class="badge badge-soft-success">CURRENT</span>
+                {% else %}
+                {{ r.effective_to }}
+                {% endif %}
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="3" class="text-center text-secondary py-3">No rates configured yet.</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header fw-semibold">Change Admin Password</div>
+
+    <!-- CHANGE ADMIN PASSWORD -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <i class="bi bi-shield-lock-fill me-2 text-danger"></i>Change Admin Password
+      </div>
       <div class="card-body">
         <form method="post">
           <input type="hidden" name="action" value="password" />
           <div class="mb-3">
-            <label class="form-label">Current Password</label
-            ><input
+            <label class="form-label">Current Password</label>
+            <input
               class="form-control"
               type="password"
               name="current_password"
               required
             />
           </div>
-          <div class="mb-3">
-            <label class="form-label">New Password</label
-            ><input
+          <div class="mb-4">
+            <label class="form-label">New Password (Min 8 characters)</label>
+            <input
               class="form-control"
               type="password"
               name="new_password"
@@ -134,7 +178,9 @@ content %}
               required
             />
           </div>
-          <button class="btn btn-outline-dark">Update Password</button>
+          <button class="btn btn-outline-dark w-100">
+            <i class="bi bi-key me-1"></i> Update Security Credentials
+          </button>
         </form>
       </div>
     </div>

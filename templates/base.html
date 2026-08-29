@@ -4,10 +4,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Rental Accommodation{% endblock %}</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
     />
+    <!-- Bootstrap Icons CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- Custom Theme CSS -->
     <link
       href="{{ url_for('static', filename='css/app.css') }}"
       rel="stylesheet"
@@ -15,16 +26,19 @@
   </head>
   <body>
     {% if session.admin_id %}
-    <nav class="navbar navbar-dark bg-dark sticky-top shadow-sm">
+    <nav class="navbar navbar-dark sticky-top shadow-sm navbar-custom">
       <div class="container-fluid">
-        <a class="navbar-brand fw-semibold" href="{{ url_for('dashboard') }}"
-          >Rental Accommodation</a
-        >
-        <div class="d-flex align-items-center gap-2">
-          <span class="text-white-50 small">{{ session.username }}</span>
-          <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}"
-            >Logout</a
-          >
+        <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{{ url_for('dashboard') }}">
+          <span class="brand-badge"><i class="bi bi-building-fill-gear"></i></span>
+          <span>NIVARA Rental Accommodations</span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge badge-soft-secondary py-2 px-3 border border-secondary-subtle">
+            <i class="bi bi-person-circle me-1"></i> {{ session.username }}
+          </span>
+          <a class="btn btn-outline-light btn-sm px-3" href="{{ url_for('logout') }}">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
         </div>
       </div>
     </nav>
@@ -35,43 +49,51 @@
             <a
               class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}"
               href="{{ url_for('dashboard') }}"
-              >Dashboard</a
             >
+              <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
             <a
               class="nav-link {% if request.endpoint=='rooms' %}active{% endif %}"
               href="{{ url_for('rooms') }}"
-              >Rooms</a
             >
+              <i class="bi bi-door-open-fill"></i> Rooms
+            </a>
             <a
               class="nav-link {% if request.endpoint in ['families','checkout_family'] %}active{% endif %}"
               href="{{ url_for('families') }}"
-              >Families</a
             >
+              <i class="bi bi-people-fill"></i> Families
+            </a>
             <a
               class="nav-link {% if request.endpoint=='electricity' %}active{% endif %}"
               href="{{ url_for('electricity') }}"
-              >Electricity</a
             >
+              <i class="bi bi-lightning-charge-fill"></i> Electricity
+            </a>
             <a
               class="nav-link {% if request.endpoint in ['bills','bill_detail'] %}active{% endif %}"
               href="{{ url_for('bills') }}"
-              >Bills</a
             >
+              <i class="bi bi-receipt-cutoff"></i> Bills & Billing
+            </a>
             <a
               class="nav-link {% if request.endpoint=='settings' %}active{% endif %}"
               href="{{ url_for('settings') }}"
-              >Settings</a
             >
+              <i class="bi bi-gear-wide-connected"></i> Settings
+            </a>
           </nav>
         </aside>
         <main class="col-lg-10 p-4">
           {% with messages = get_flashed_messages(with_categories=true) %} {%
           for category, message in messages %}
           <div
-            class="alert alert-{{ category }} alert-dismissible fade show"
+            class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm rounded-3"
             role="alert"
           >
-            {{ message }}<button
+            <i class="bi {% if category=='success' %}bi-check-circle-fill{% elif category=='warning' %}bi-exclamation-triangle-fill{% else %}bi-exclamation-octagon-fill{% endif %} me-2"></i>
+            {{ message }}
+            <button
               type="button"
               class="btn-close"
               data-bs-dismiss="alert"
