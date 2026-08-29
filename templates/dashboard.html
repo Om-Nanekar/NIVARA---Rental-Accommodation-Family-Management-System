@@ -4,6 +4,28 @@
 
 {% block content %}
 
+<!-- WELCOME BANNER BOX -->
+<div class="card shadow-sm border-0 mb-4 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #312e81 100%); border-radius: 14px;">
+    <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-white p-2 rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                <img src="{{ url_for('static', filename='images/Main_logo.svg') }}" alt="Logo" style="max-height: 38px; width: auto;">
+            </div>
+            <div>
+                <h2 class="h4 fw-bold mb-1 text-white">Welcome, {{ settings.upi_name if settings and settings.upi_name else session.username }}! 👋</h2>
+                <p class="text-white-50 mb-0 small">
+                    Property: <strong>{{ settings.property_name if settings and settings.property_name else 'NIVARA Accommodations' }}</strong> · Today: {{ current_date.strftime('%d %b %Y') }}
+                </p>
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-white text-dark py-2 px-3 fw-semibold shadow-sm">
+                <i class="bi bi-person-check-fill me-1 text-primary"></i> {{ settings.upi_name if settings and settings.upi_name else session.username }}
+            </span>
+        </div>
+    </div>
+</div>
+
 <!-- HEADER -->
 <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
     <div>

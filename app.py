@@ -69,7 +69,10 @@ def money(value):
 
 @app.context_processor
 def inject_globals():
-    return {"current_date": date.today()}
+    return {
+        "current_date": date.today(),
+        "settings": get_settings()
+    }
 
 
 @app.route("/")

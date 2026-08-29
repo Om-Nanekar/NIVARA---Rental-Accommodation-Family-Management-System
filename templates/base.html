@@ -26,11 +26,11 @@
   </head>
   <body>
     {% if session.admin_id %}
-    <nav class="navbar navbar-dark sticky-top shadow-sm navbar-custom">
+    <nav class="navbar navbar-dark fixed-top shadow-sm navbar-custom">
       <div class="container-fluid">
         <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{{ url_for('dashboard') }}">
-          <span class="brand-badge"><i class="bi bi-building-fill-gear"></i></span>
-          <span>NIVARA Rental Accommodations</span>
+          <img src="{{ url_for('static', filename='images/Main_logo.svg') }}" alt="NIVARA Logo" style="height: 32px; width: auto;" class="d-inline-block align-text-top">
+          <span>{{ settings.property_name if settings and settings.property_name else 'NIVARA Rental Accommodations' }}</span>
         </a>
         <div class="d-flex align-items-center gap-3">
           <span class="badge badge-soft-secondary py-2 px-3 border border-secondary-subtle">
@@ -42,7 +42,7 @@
         </div>
       </div>
     </nav>
-    <div class="container-fluid">
+    <div class="container-fluid app-wrapper">
       <div class="row">
         <aside class="col-lg-2 sidebar py-4">
           <nav class="nav flex-column gap-1">
