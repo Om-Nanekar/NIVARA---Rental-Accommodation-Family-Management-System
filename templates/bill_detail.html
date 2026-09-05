@@ -1,183 +1,214 @@
 {% extends 'base.html' %}
 
-{% block title %}Bill #{{ bill.bill_id }}{% endblock %}
+{% block title %}Invoice #{{ bill.bill_id }}{% endblock %}
 
 {% block content %}
-<!-- HEADER -->
-<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
-    <div>
-        <h1 class="h3 fw-bold mb-1">Invoice Snapshot #{{ bill.bill_id }}</h1>
-        <p class="text-secondary small mb-0">
-            <i class="bi bi-person-fill me-1"></i><strong>{{ family.head_name }}</strong> · Room {{ room.room_number }} · Month: {{ bill.billing_month }}
-        </p>
-    </div>
-    <div class="d-flex gap-2">
-        <a class="btn btn-outline-dark shadow-sm" href="{{ url_for('bill_pdf', bill_id=bill.bill_id) }}">
-            <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Download PDF
-        </a>
-        <a class="btn btn-indigo shadow-sm" href="{{ url_for('bills') }}">
-            <i class="bi bi-arrow-left me-1"></i> All Bills
-        </a>
-    </div>
+
+<!-- PAGE HEADER -->
+<div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+  <div>
+    <h1 class="page-title">Invoice #{{ bill.bill_id }}</h1>
+    <p class="page-subtitle">
+      Tenant: <strong>{{ family.head_name }}</strong> · Room {{ room.room_number }} · Billing Period: {{ bill.billing_month }}
+    </p>
+  </div>
+  <div class="page-actions d-flex align-items-center gap-2">
+    <a class="btn btn-secondary" href="{{ url_for('bill_pdf', bill_id=bill.bill_id) }}">
+      <i class="bi bi-file-earmark-pdf text-danger"></i>
+      <span>Download PDF</span>
+    </a>
+    <a class="btn btn-outline" href="{{ url_for('bills') }}">
+      <i class="bi bi-arrow-left"></i>
+      <span>All Invoices</span>
+    </a>
+  </div>
 </div>
 
 <div class="row g-4">
-    <!-- LEFT COLUMN: BILL SNAPSHOT & PAYMENTS -->
-    <div class="col-xl-8">
-        <!-- BILL SNAPSHOT TABLE -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-file-text me-2"></i>Bill Breakdown</span>
-                {% if bill.payment_status == 'PAID' %}
-                <span class="badge badge-soft-success"><i class="bi bi-check-circle me-1"></i>PAID</span>
-                {% elif bill.payment_status == 'PARTIALLY_PAID' %}
-                <span class="badge badge-soft-warning"><i class="bi bi-pie-chart me-1"></i>PARTIALLY PAID</span>
-                {% else %}
-                <span class="badge badge-soft-danger"><i class="bi bi-clock-history me-1"></i>UNPAID</span>
-                {% endif %}
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="w-50 ps-4 text-secondary">Room Rent Snapshot</th>
-                                <td class="fw-semibold">{{ bill.rent_amount|money }}</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 text-secondary">Electricity Consumed</th>
-                                <td>{{ bill.units_consumed }} kWh</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 text-secondary">Electricity Rate Snapshot</th>
-                                <td>{{ bill.electricity_rate|money }} / unit</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 text-secondary">Electricity Charge Amount</th>
-                                <td class="fw-semibold">{{ bill.electricity_amount|money }}</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 text-secondary">Other Maintenance Charges</th>
-                                <td>{{ bill.other_charges|money }}</td>
-                            </tr>
-                            <tr class="table-light border-top border-bottom">
-                                <th class="ps-4 fs-6 fw-bold text-dark">Total Amount Payable</th>
-                                <td class="fs-6 fw-bold text-indigo">{{ bill.total_payable|money }}</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 text-secondary">Total Amount Paid</th>
-                                <td class="fw-semibold text-success">{{ paid|money }}</td>
-                            </tr>
-                            <tr class="table-warning border-top border-bottom">
-                                <th class="ps-4 fs-6 fw-bold text-dark">Remaining Balance Due</th>
-                                <td class="fs-6 fw-bold text-danger">{{ balance|money }}</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 text-secondary">Payment Due Date</th>
-                                <td><i class="bi bi-calendar-event me-1"></i>{{ bill.due_date }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <!-- LEFT COLUMN: SNAPSHOT & TRANSACTIONS -->
+  <div class="col-12 col-xl-8">
+    <!-- BILL BREAKDOWN CARD -->
+    <div class="card-nivara mb-4">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title">
+          <i class="bi bi-file-text text-secondary"></i>
+          <span>Financial Snapshot Breakdown</span>
+        </h3>
+        <div>
+          {% if bill.payment_status == 'PAID' %}
+            <span class="badge-status badge-status-success"><span class="badge-dot"></span> Paid</span>
+          {% elif bill.payment_status == 'PARTIALLY_PAID' %}
+            <span class="badge-status badge-status-warning"><span class="badge-dot"></span> Partially Paid</span>
+          {% else %}
+            <span class="badge-status badge-status-danger"><span class="badge-dot"></span> Unpaid</span>
+          {% endif %}
         </div>
+      </div>
 
-        <!-- PAYMENT HISTORY -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <i class="bi bi-clock-history me-2"></i>Payment Transaction History
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Amount Paid</th>
-                            <th>Payment Method</th>
-                            <th>Transaction Ref</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in payments %}
-                        <tr>
-                            <td><i class="bi bi-calendar-check me-1 text-muted"></i>{{ p.payment_date }}</td>
-                            <td class="fw-bold text-success">{{ p.amount_paid|money }}</td>
-                            <td><span class="badge badge-soft-primary"><i class="bi bi-credit-card me-1"></i>{{ p.payment_method }}</span></td>
-                            <td><code class="text-dark">{{ p.transaction_ref or '—' }}</code></td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="4" class="text-center text-secondary py-4">
-                                <i class="bi bi-wallet-2 fs-3 d-block mb-1 text-muted"></i>
-                                No payment transactions recorded yet.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+      <div class="table-responsive">
+        <table class="table-nivara mb-0">
+          <tbody>
+            <tr>
+              <td class="text-secondary w-50">Room Rent (Snapshot)</td>
+              <td class="text-money fw-medium">{{ bill.rent_amount|money }}</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">Electricity Consumed</td>
+              <td class="text-money">{{ bill.units_consumed }} kWh</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">Electricity Rate (Snapshot)</td>
+              <td class="text-money">{{ bill.electricity_rate|money }} / unit</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">Electricity Subtotal</td>
+              <td class="text-money fw-medium">{{ bill.electricity_amount|money }}</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">Other Maintenance Charges</td>
+              <td class="text-money">{{ bill.other_charges|money }}</td>
+            </tr>
+            <tr style="background-color: var(--surface-muted); font-weight: 600;">
+              <td class="text-primary-dark">Total Amount Payable</td>
+              <td class="text-money text-primary fs-6">{{ bill.total_payable|money }}</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">Total Paid to Date</td>
+              <td class="text-money text-success fw-medium">{{ paid|money }}</td>
+            </tr>
+            <tr style="background-color: var(--warning-bg); font-weight: 600;">
+              <td class="text-dark">Outstanding Balance Due</td>
+              <td class="text-money text-danger fs-6">{{ balance|money }}</td>
+            </tr>
+            <tr>
+              <td class="text-secondary">Payment Due Date</td>
+              <td class="text-money text-secondary">{{ bill.due_date }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- RIGHT COLUMN: UPI QR & RECORD PAYMENT -->
-    <div class="col-xl-4">
-        <!-- UPI PAYMENT QR CARD -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body text-center p-4">
-                <h5 class="fw-bold mb-3"><i class="bi bi-qr-code-scan me-2 text-indigo"></i>UPI Payment QR</h5>
-                <div class="qr-container shadow-sm mb-3">
-                    <img class="qr-image" src="{{ url_for('bill_qr', bill_id=bill.bill_id) }}" alt="UPI QR Code">
-                </div>
-                <div class="fw-bold fs-5 text-dark">Balance: <span class="text-danger">{{ balance|money }}</span></div>
-                <div class="small text-muted mt-2 text-break bg-light p-2 rounded border">
-                    <i class="bi bi-link-45deg me-1"></i>{{ upi_uri }}
-                </div>
-            </div>
-        </div>
+    <!-- PAYMENT HISTORY -->
+    <div class="card-nivara">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title">
+          <i class="bi bi-clock-history text-secondary"></i>
+          <span>Payment Transactions</span>
+        </h3>
+        <span class="badge-status badge-status-neutral">{{ payments|length }} Records</span>
+      </div>
 
-        <!-- RECORD PAYMENT FORM -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <i class="bi bi-cash-coin me-2 text-success"></i>Record New Payment
-            </div>
-            <div class="card-body">
-                <form method="post" action="{{ url_for('record_payment', bill_id=bill.bill_id) }}">
-                    <div class="mb-3">
-                        <label class="form-label">Payment Amount (₹)</label>
-                        <input
-                            name="amount_paid"
-                            type="number"
-                            class="form-control"
-                            min="0.01"
-                            max="{{ balance }}"
-                            step="0.01"
-                            value="{{ balance if balance > 0 else '0.00' }}"
-                            required
-                        >
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Payment Method</label>
-                        <select class="form-select" name="payment_method" required>
-                            <option value="UPI">UPI Payment</option>
-                            <option value="CASH">Cash</option>
-                            <option value="BANK_TRANSFER">Bank Transfer / NEFT</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Transaction Reference / UTR</label>
-                        <input
-                            name="transaction_ref"
-                            class="form-control"
-                            placeholder="e.g. UPI Ref / Receipt No."
-                            maxlength="100"
-                        >
-                    </div>
-                    <button class="btn btn-indigo w-100 py-2" {% if balance <= 0 %}disabled{% endif %}>
-                        <i class="bi bi-check-circle-fill me-1"></i> Submit Payment
-                    </button>
-                </form>
-            </div>
-        </div>
+      <div class="table-responsive">
+        <table class="table-nivara">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th class="text-money">Amount Paid</th>
+              <th>Method</th>
+              <th>Reference / UTR</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in payments %}
+            <tr>
+              <td class="text-secondary">{{ p.payment_date }}</td>
+              <td class="text-money text-success fw-medium">{{ p.amount_paid|money }}</td>
+              <td><span class="badge-status badge-status-neutral">{{ p.payment_method }}</span></td>
+              <td><span class="text-muted font-monospace small">{{ p.transaction_ref or '—' }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="4">
+                <div class="empty-state py-4">
+                  <div class="empty-state-icon"><i class="bi bi-wallet2"></i></div>
+                  <div class="empty-state-title">No payments recorded yet</div>
+                  <div class="empty-state-desc">Record a payment below once the tenant makes a payment.</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
+
+  <!-- RIGHT COLUMN: UPI QR & PAYMENT ENTRY -->
+  <div class="col-12 col-xl-4">
+    <!-- UPI QR CODE -->
+    <div class="card-nivara mb-4 text-center">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title mx-auto">
+          <i class="bi bi-qr-code text-secondary"></i>
+          <span>UPI Instant Payment QR</span>
+        </h3>
+      </div>
+      <div class="card-nivara-body">
+        <div class="qr-card-container mb-3 mx-auto">
+          <img class="qr-card-image" src="{{ url_for('bill_qr', bill_id=bill.bill_id) }}" alt="UPI QR Code" />
+        </div>
+        <div class="fw-semibold text-primary-dark mb-1">
+          Pending Balance: <span class="text-danger">{{ balance|money }}</span>
+        </div>
+        <div class="text-muted small mt-2 p-2 bg-light rounded text-break border">
+          <span class="d-block text-secondary font-monospace" style="font-size: 11px;">{{ upi_uri }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECORD PAYMENT FORM -->
+    <div class="card-nivara">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title">
+          <i class="bi bi-cash-stack text-success"></i>
+          <span>Record New Payment</span>
+        </h3>
+      </div>
+      <div class="card-nivara-body">
+        <form method="post" action="{{ url_for('record_payment', bill_id=bill.bill_id) }}">
+          <div class="form-group mb-3">
+            <label class="form-label">Payment Amount (₹)</label>
+            <input
+              name="amount_paid"
+              type="number"
+              class="form-control"
+              min="0.01"
+              max="{{ balance }}"
+              step="0.01"
+              value="{{ balance if balance > 0 else '0.00' }}"
+              required
+              {% if balance <= 0 %}disabled{% endif %}
+            />
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Payment Method</label>
+            <select class="form-select" name="payment_method" required {% if balance <= 0 %}disabled{% endif %}>
+              <option value="UPI">UPI</option>
+              <option value="CASH">Cash</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Transaction Reference / UTR</label>
+            <input
+              name="transaction_ref"
+              class="form-control"
+              placeholder="e.g. UPI Ref / Receipt No."
+              maxlength="100"
+              {% if balance <= 0 %}disabled{% endif %}
+            />
+          </div>
+
+          <button class="btn btn-primary w-100" type="submit" {% if balance <= 0 %}disabled{% endif %}>
+            Save Payment Record
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

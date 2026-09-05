@@ -3,192 +3,162 @@
 {% block title %}Rooms{% endblock %} 
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+
+<!-- PAGE HEADER -->
+<div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
   <div>
-    <h1 class="h3 fw-bold mb-1">Room Management</h1>
-    <p class="text-secondary small mb-0">
-      Configure room inventory, floor levels, monthly rent rates, and occupancy status.
-    </p>
+    <h1 class="page-title">Rooms</h1>
+    <p class="page-subtitle">Manage room inventory, occupancy status, floor levels, and monthly rent.</p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addRoomCollapse" aria-expanded="false" aria-controls="addRoomCollapse">
+      <i class="bi bi-plus-lg"></i>
+      <span>Add Room</span>
+    </button>
   </div>
 </div>
 
-<!-- ADD ROOM FORM -->
-<div class="card mb-4 shadow-sm">
-  <div class="card-header bg-light">
-    <i class="bi bi-plus-circle-fill me-2 text-indigo"></i>Add New Room
-  </div>
-  <div class="card-body">
-    <form method="post" class="row g-3 align-items-end">
-      <input type="hidden" name="action" value="add" />
-      <div class="col-md-2">
-        <label class="form-label">Room No.</label>
-        <input
-          class="form-control"
-          name="room_number"
-          placeholder="e.g. 101"
-          maxlength="10"
-          required
-        />
-      </div>
-      <div class="col-md-2">
-        <label class="form-label">Floor</label>
-        <input
-          class="form-control"
-          name="floor"
-          type="number"
-          min="0"
-          placeholder="0, 1, 2"
-          required
-        />
-      </div>
-      <div class="col-md-2">
-        <label class="form-label">Capacity</label>
-        <input
-          class="form-control"
-          name="capacity"
-          type="number"
-          min="1"
-          placeholder="Max members"
-          required
-        />
-      </div>
-      <div class="col-md-3">
-        <label class="form-label">Monthly Rent (₹)</label>
-        <input
-          class="form-control"
-          name="current_rent"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="0.00"
-          required
-        />
-      </div>
-      <div class="col-md-3">
-        <button class="btn btn-indigo w-100">
-          <i class="bi bi-plus-lg me-1"></i> Add Room
-        </button>
-      </div>
-    </form>
+<!-- ADD ROOM COLLAPSIBLE FORM -->
+<div class="collapse mb-4" id="addRoomCollapse">
+  <div class="card-nivara">
+    <div class="card-nivara-header">
+      <h3 class="card-nivara-title">
+        <i class="bi bi-plus-circle text-primary"></i>
+        <span>New Room Details</span>
+      </h3>
+    </div>
+    <div class="card-nivara-body">
+      <form method="post">
+        <input type="hidden" name="action" value="add" />
+        <div class="row g-3">
+          <div class="col-12 col-sm-6 col-md-3">
+            <label class="form-label">Room Number</label>
+            <input class="form-control" name="room_number" placeholder="e.g. 101, A-02" maxlength="10" required />
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <label class="form-label">Floor</label>
+            <input class="form-control" name="floor" type="number" min="0" placeholder="0, 1, 2" required />
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <label class="form-label">Capacity (Persons)</label>
+            <input class="form-control" name="capacity" type="number" min="1" placeholder="Max residents" required />
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <label class="form-label">Monthly Rent (₹)</label>
+            <input class="form-control" name="current_rent" type="number" min="0" step="0.01" placeholder="0.00" required />
+          </div>
+          <div class="col-12 d-flex justify-content-end gap-2 pt-2">
+            <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#addRoomCollapse">Cancel</button>
+            <button class="btn btn-primary" type="submit">Save Room</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- ROOM REGISTER TABLE -->
-<div class="card shadow-sm">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-door-open me-2"></i>Room Register</span>
-    <span class="badge badge-soft-secondary">{{ rooms|length }} Rooms Total</span>
+<!-- ROOMS REGISTER -->
+<div class="card-nivara">
+  <div class="card-nivara-header">
+    <h3 class="card-nivara-title">
+      <i class="bi bi-door-open text-secondary"></i>
+      <span>Room Register</span>
+    </h3>
+    <span class="badge-status badge-status-neutral">{{ rooms|length }} Total Units</span>
   </div>
+
+  <!-- FILTER TOOLBAR -->
+  <div class="p-3 border-bottom bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <div class="search-input-wrapper">
+      <i class="bi bi-search"></i>
+      <input type="text" class="form-control" id="roomSearchInput" placeholder="Search room or resident..." />
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select form-select-sm" id="roomStatusFilter" style="width: 150px;">
+        <option value="">All Statuses</option>
+        <option value="AVAILABLE">Available</option>
+        <option value="OCCUPIED">Occupied</option>
+        <option value="MAINTENANCE">Maintenance</option>
+      </select>
+    </div>
+  </div>
+
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
+    <table class="table-nivara" id="roomsTable">
       <thead>
         <tr>
           <th>Room</th>
           <th>Floor</th>
           <th>Capacity</th>
-          <th>Current Rent</th>
+          <th class="text-money">Monthly Rent</th>
           <th>Status</th>
-          <th>Occupying Family</th>
-          <th class="text-end">Actions</th>
+          <th>Active Resident</th>
+          <th style="text-align: right;">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for r in rooms %}
-        <tr>
-          <td class="fw-bold text-dark">Room {{ r.room_number }}</td>
+        <tr class="room-row" data-status="{{ r.status }}">
+          <td class="fw-semibold text-primary-dark">Room {{ r.room_number }}</td>
           <td>Floor {{ r.floor }}</td>
-          <td><i class="bi bi-people me-1 text-muted"></i>{{ r.capacity }} persons</td>
-          <td class="fw-semibold text-dark">{{ r.current_rent|money }}</td>
+          <td><span class="text-secondary">{{ r.capacity }} persons</span></td>
+          <td class="text-money fw-medium">{{ r.current_rent|money }}</td>
           <td>
             {% if r.status == 'AVAILABLE' %}
-            <span class="badge badge-soft-success"><i class="bi bi-check-circle me-1"></i>AVAILABLE</span>
+              <span class="badge-status badge-status-success"><span class="badge-dot"></span> Available</span>
             {% elif r.status == 'OCCUPIED' %}
-            <span class="badge badge-soft-primary"><i class="bi bi-house-door me-1"></i>OCCUPIED</span>
+              <span class="badge-status badge-status-primary"><span class="badge-dot"></span> Occupied</span>
             {% else %}
-            <span class="badge badge-soft-secondary"><i class="bi bi-wrench me-1"></i>MAINTENANCE</span>
+              <span class="badge-status badge-status-warning"><span class="badge-dot"></span> Maintenance</span>
             {% endif %}
           </td>
           <td>
             {% if r.head_name %}
-            <span class="fw-semibold"><i class="bi bi-person-fill me-1 text-primary"></i>{{ r.head_name }}</span>
+              <span class="fw-medium text-dark"><i class="bi bi-person me-1 text-muted"></i>{{ r.head_name }}</span>
             {% else %}
-            <span class="text-muted">—</span>
+              <span class="text-muted">—</span>
             {% endif %}
           </td>
-          <td class="text-end">
+          <td style="text-align: right;">
             <details class="d-inline-block text-start">
-              <summary class="btn btn-sm btn-outline-dark">
-                <i class="bi bi-sliders me-1"></i> Manage
+              <summary class="btn btn-secondary btn-sm" style="list-style: none;">
+                <span>Manage</span>
+                <i class="bi bi-chevron-down ms-1" style="font-size: 11px;"></i>
               </summary>
-              <div class="manage-panel mt-2 position-relative shadow">
+              <div class="details-panel position-absolute end-0 me-3 shadow-sm" style="z-index: 100; min-width: 320px;">
                 <form method="post" class="mb-3">
                   <input type="hidden" name="action" value="update" />
                   <input type="hidden" name="room_id" value="{{ r.room_id }}" />
-                  <div class="row g-2">
-                    <div class="col-3">
-                      <label class="form-label small">Room</label>
-                      <input
-                        class="form-control form-control-sm"
-                        name="room_number"
-                        value="{{ r.room_number }}"
-                        required
-                      />
+                  <div class="mb-2">
+                    <label class="form-label" style="font-size: 11.5px;">Room Number</label>
+                    <input class="form-control form-control-sm" name="room_number" value="{{ r.room_number }}" required />
+                  </div>
+                  <div class="row g-2 mb-2">
+                    <div class="col-6">
+                      <label class="form-label" style="font-size: 11.5px;">Floor</label>
+                      <input class="form-control form-control-sm" name="floor" type="number" value="{{ r.floor }}" required />
                     </div>
-                    <div class="col-2">
-                      <label class="form-label small">Floor</label>
-                      <input
-                        class="form-control form-control-sm"
-                        name="floor"
-                        type="number"
-                        value="{{ r.floor }}"
-                        required
-                      />
-                    </div>
-                    <div class="col-2">
-                      <label class="form-label small">Cap.</label>
-                      <input
-                        class="form-control form-control-sm"
-                        name="capacity"
-                        type="number"
-                        value="{{ r.capacity }}"
-                        required
-                      />
-                    </div>
-                    <div class="col-3">
-                      <label class="form-label small">Rent</label>
-                      <input
-                        class="form-control form-control-sm"
-                        name="current_rent"
-                        type="number"
-                        step="0.01"
-                        value="{{ r.current_rent }}"
-                        required
-                      />
-                    </div>
-                    <div class="col-2 d-flex align-items-end">
-                      <button class="btn btn-sm btn-indigo w-100">Save</button>
+                    <div class="col-6">
+                      <label class="form-label" style="font-size: 11.5px;">Capacity</label>
+                      <input class="form-control form-control-sm" name="capacity" type="number" value="{{ r.capacity }}" required />
                     </div>
                   </div>
+                  <div class="mb-2">
+                    <label class="form-label" style="font-size: 11.5px;">Rent (₹)</label>
+                    <input class="form-control form-control-sm" name="current_rent" type="number" step="0.01" value="{{ r.current_rent }}" required />
+                  </div>
+                  <button class="btn btn-primary btn-sm w-100" type="submit">Save Changes</button>
                 </form>
-                <div class="border-top pt-2 d-flex justify-content-between align-items-center">
-                  <span class="small text-secondary fw-semibold">Quick Status Switch:</span>
-                  <form method="post" class="d-inline-flex gap-1">
+
+                <div class="border-top pt-2">
+                  <span class="d-block mb-1 text-muted" style="font-size: 11px; font-weight: 600;">Status Switch</span>
+                  <form method="post" class="d-flex gap-1">
                     <input type="hidden" name="action" value="status" />
                     <input type="hidden" name="room_id" value="{{ r.room_id }}" />
-                    <button
-                      class="btn btn-sm btn-outline-success"
-                      name="status"
-                      value="AVAILABLE"
-                      {% if r.status == 'AVAILABLE' %}disabled{% endif %}
-                    >
+                    <button class="btn btn-outline btn-sm flex-fill" style="font-size: 12px;" name="status" value="AVAILABLE" {% if r.status=='AVAILABLE' %}disabled{% endif %}>
                       Available
                     </button>
-                    <button
-                      class="btn btn-sm btn-outline-secondary"
-                      name="status"
-                      value="MAINTENANCE"
-                      {% if r.status == 'MAINTENANCE' %}disabled{% endif %}
-                    >
+                    <button class="btn btn-outline btn-sm flex-fill" style="font-size: 12px;" name="status" value="MAINTENANCE" {% if r.status=='MAINTENANCE' %}disabled{% endif %}>
                       Maintenance
                     </button>
                   </form>
@@ -199,9 +169,12 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="7" class="text-center text-secondary py-5">
-            <i class="bi bi-door-closed fs-2 text-muted d-block mb-2"></i>
-            No rooms registered in the database.
+          <td colspan="7">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="bi bi-door-closed"></i></div>
+              <div class="empty-state-title">No rooms configured</div>
+              <div class="empty-state-desc">Click "Add Room" above to register your first property unit.</div>
+            </div>
           </td>
         </tr>
         {% endfor %}
@@ -209,4 +182,5 @@
     </table>
   </div>
 </div>
+
 {% endblock %}

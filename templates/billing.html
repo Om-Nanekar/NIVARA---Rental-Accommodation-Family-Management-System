@@ -1,70 +1,99 @@
 {% extends 'base.html' %} 
 
-{% block title %}Bills & Snapshots{% endblock %} 
+{% block title %}Billing{% endblock %} 
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+
+<!-- PAGE HEADER -->
+<div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
   <div>
-    <h1 class="h3 fw-bold mb-1">Billing Register</h1>
-    <p class="text-secondary small mb-0">
-      Historical billing snapshots are immutable records of room rent, electricity units, and extra charges.
-    </p>
+    <h1 class="page-title">Billing & Invoices</h1>
+    <p class="page-subtitle">Immutable financial snapshots of monthly room rent, electricity charges, and payments.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{{ url_for('electricity') }}" class="btn btn-secondary">
+      <i class="bi bi-plus-lg"></i>
+      <span>Generate Bill Snapshot</span>
+    </a>
   </div>
 </div>
 
-<div class="card shadow-sm">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-receipt-cutoff me-2"></i>Generated Invoices & Snapshots</span>
-    <span class="badge badge-soft-secondary">{{ bills|length }} Total Records</span>
+<!-- BILLS REGISTER -->
+<div class="card-nivara">
+  <div class="card-nivara-header">
+    <h3 class="card-nivara-title">
+      <i class="bi bi-receipt text-secondary"></i>
+      <span>Invoice Register</span>
+    </h3>
+    <span class="badge-status badge-status-neutral">{{ bills|length }} Total Records</span>
   </div>
+
+  <!-- FILTER TOOLBAR -->
+  <div class="p-3 border-bottom bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <div class="search-input-wrapper">
+      <i class="bi bi-search"></i>
+      <input type="text" class="form-control" id="billSearchInput" placeholder="Search by tenant name, room or bill #..." />
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <select class="form-select form-select-sm" id="billStatusFilter" style="width: 150px;">
+        <option value="">All Statuses</option>
+        <option value="PAID">Paid</option>
+        <option value="PARTIALLY_PAID">Partially Paid</option>
+        <option value="UNPAID">Unpaid</option>
+      </select>
+    </div>
+  </div>
+
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
+    <table class="table-nivara" id="billsTable">
       <thead>
         <tr>
           <th>Bill ID</th>
-          <th>Billing Month</th>
-          <th>Family Head</th>
+          <th>Month</th>
+          <th>Tenant</th>
           <th>Room</th>
-          <th>Total Payable</th>
-          <th>Amount Paid</th>
-          <th>Balance Due</th>
-          <th>Payment Status</th>
-          <th class="text-end">Action</th>
+          <th class="text-money">Total Payable</th>
+          <th class="text-money">Amount Paid</th>
+          <th class="text-money">Balance Due</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
         </tr>
       </thead>
       <tbody>
         {% for b in bills %}
-        <tr>
-          <td class="fw-bold text-dark">#{{ b.bill_id }}</td>
-          <td><span class="badge badge-soft-secondary"><i class="bi bi-calendar-event me-1"></i>{{ b.billing_month }}</span></td>
-          <td class="fw-semibold">{{ b.head_name }}</td>
-          <td><span class="badge badge-soft-primary">Room {{ b.room_number }}</span></td>
-          <td class="fw-semibold text-dark">{{ b.total_payable|money }}</td>
-          <td class="text-success">{{ b.paid|money }}</td>
-          <td class="fw-bold {% if b.balance > 0 %}text-danger{% else %}text-muted{% endif %}">{{ b.balance|money }}</td>
+        <tr class="bill-row" data-status="{{ b.payment_status }}">
+          <td class="fw-semibold text-secondary">#{{ b.bill_id }}</td>
+          <td><span class="badge-status badge-status-neutral">{{ b.billing_month }}</span></td>
+          <td class="fw-semibold text-primary-dark">{{ b.head_name }}</td>
+          <td><span class="badge-status badge-status-neutral">Room {{ b.room_number }}</span></td>
+          <td class="text-money fw-medium">{{ b.total_payable|money }}</td>
+          <td class="text-money text-success">{{ b.paid|money }}</td>
+          <td class="text-money fw-semibold {% if b.balance > 0 %}text-danger{% else %}text-muted{% endif %}">
+            {{ b.balance|money }}
+          </td>
           <td>
             {% if b.payment_status == 'PAID' %}
-            <span class="badge badge-soft-success"><i class="bi bi-check-circle me-1"></i>PAID</span>
+              <span class="badge-status badge-status-success"><span class="badge-dot"></span> Paid</span>
             {% elif b.payment_status == 'PARTIALLY_PAID' %}
-            <span class="badge badge-soft-warning"><i class="bi bi-pie-chart me-1"></i>PARTIAL</span>
+              <span class="badge-status badge-status-warning"><span class="badge-dot"></span> Partial</span>
             {% else %}
-            <span class="badge badge-soft-danger"><i class="bi bi-clock-history me-1"></i>UNPAID</span>
+              <span class="badge-status badge-status-danger"><span class="badge-dot"></span> Unpaid</span>
             {% endif %}
           </td>
-          <td class="text-end">
-            <a
-              class="btn btn-sm btn-indigo"
-              href="{{ url_for('bill_detail', bill_id=b.bill_id) }}"
-            >
-              <i class="bi bi-eye me-1"></i> Open Bill
+          <td style="text-align: right;">
+            <a class="btn btn-secondary btn-sm" href="{{ url_for('bill_detail', bill_id=b.bill_id) }}">
+              View Invoice
             </a>
           </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="9" class="text-center text-secondary py-5">
-            <i class="bi bi-receipt fs-2 text-muted d-block mb-2"></i>
-            No bills generated yet in the system.
+          <td colspan="9">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="bi bi-receipt"></i></div>
+              <div class="empty-state-title">No invoices generated</div>
+              <div class="empty-state-desc">Generate monthly billing snapshots for active families from the Electricity section.</div>
+            </div>
           </td>
         </tr>
         {% endfor %}
@@ -72,4 +101,5 @@
     </table>
   </div>
 </div>
+
 {% endblock %}

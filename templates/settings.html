@@ -3,187 +3,150 @@
 {% block title %}Settings{% endblock %} 
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+
+<!-- PAGE HEADER -->
+<div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
   <div>
-    <h1 class="h3 fw-bold mb-1">System Settings</h1>
-    <p class="text-secondary small mb-0">
-      Manage property identity, UPI payment receivers, electricity unit rates, and admin security credentials.
-    </p>
+    <h1 class="page-title">Settings</h1>
+    <p class="page-subtitle">Configure property details, UPI payment receiving accounts, electricity tariffs, and admin credentials.</p>
   </div>
 </div>
 
 <div class="row g-4">
-  <!-- LEFT COLUMN: PROPERTY & UPI -->
-  <div class="col-xl-6">
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <i class="bi bi-building-gear me-2 text-indigo"></i>Property & UPI Payment Receiver Info
+  <!-- LEFT COLUMN: PROPERTY & UPI SETTINGS -->
+  <div class="col-12 col-xl-6">
+    <div class="card-nivara mb-4">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title">
+          <i class="bi bi-building text-secondary"></i>
+          <span>Property Profile & UPI Receiving Info</span>
+        </h3>
       </div>
-      <div class="card-body">
+      <div class="card-nivara-body">
         <form method="post">
           <input type="hidden" name="action" value="property" />
-          <div class="mb-3">
+          <div class="form-group">
             <label class="form-label">Property Name</label>
-            <input
-              class="form-control"
-              name="property_name"
-              value="{{ settings.property_name if settings else '' }}"
-              placeholder="e.g. Nivara Accommodation"
-              required
-            />
+            <input class="form-control" name="property_name" value="{{ settings.property_name if settings else '' }}" placeholder="e.g. Sunrise Accommodations" required />
           </div>
-          <div class="mb-3">
-            <label class="form-label">Property Contact Number / Address</label>
-            <input
-              class="form-control"
-              name="property_contact"
-              value="{{ settings.property_contact if settings else '' }}"
-              placeholder="e.g. +91 9876543210"
-              required
-            />
+
+          <div class="form-group">
+            <label class="form-label">Property Contact / Phone</label>
+            <input class="form-control" name="property_contact" value="{{ settings.property_contact if settings else '' }}" placeholder="e.g. +91 9876543210" required />
           </div>
-          <div class="mb-3">
-            <label class="form-label">UPI VPA / ID</label>
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-qr-code"></i></span>
-              <input
-                class="form-control"
-                name="upi_id"
-                value="{{ settings.upi_id if settings else '' }}"
-                placeholder="e.g. name@upi"
-                required
-              />
-            </div>
+
+          <div class="form-group">
+            <label class="form-label">UPI ID / VPA</label>
+            <input class="form-control" name="upi_id" value="{{ settings.upi_id if settings else '' }}" placeholder="e.g. property@upi" required />
+            <div class="form-text">Used for dynamic QR code payment generation on invoices.</div>
           </div>
-          <div class="mb-4">
+
+          <div class="form-group mb-4">
             <label class="form-label">UPI Account Receiver Name</label>
-            <input
-              class="form-control"
-              name="upi_name"
-              value="{{ settings.upi_name if settings else '' }}"
-              placeholder="Registered UPI Name"
-              required
-            />
+            <input class="form-control" name="upi_name" value="{{ settings.upi_name if settings else '' }}" placeholder="Receiver / Landlord name" required />
           </div>
-          <button class="btn btn-indigo w-100">
-            <i class="bi bi-save me-1"></i> Save Property & UPI Settings
+
+          <button class="btn btn-primary w-100" type="submit">
+            Save Property & UPI Settings
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- RIGHT COLUMN: ELECTRICITY RATE & SECURITY -->
-  <div class="col-xl-6">
+  <!-- RIGHT COLUMN: ELECTRICITY RATES & SECURITY -->
+  <div class="col-12 col-xl-6">
     <!-- ADD ELECTRICITY RATE -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-light">
-        <i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Configure Electricity Rate
+    <div class="card-nivara mb-4">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title">
+          <i class="bi bi-lightning-charge text-warning"></i>
+          <span>Electricity Tariff Configuration</span>
+        </h3>
       </div>
-      <div class="card-body">
+      <div class="card-nivara-body">
         <form method="post" class="row g-3 align-items-end">
           <input type="hidden" name="action" value="rate" />
-          <div class="col-6">
+          <div class="col-12 col-sm-6">
             <label class="form-label">Rate per Unit (₹)</label>
-            <input
-              class="form-control"
-              type="number"
-              min="0"
-              step="0.01"
-              name="rate_per_unit"
-              placeholder="0.00"
-              required
-            />
+            <input class="form-control" type="number" min="0" step="0.01" name="rate_per_unit" placeholder="0.00" required />
           </div>
-          <div class="col-6">
+          <div class="col-12 col-sm-6">
             <label class="form-label">Effective From</label>
-            <input
-              class="form-control"
-              type="date"
-              name="effective_from"
-              value="{{ current_date }}"
-              required
-            />
+            <input class="form-control" type="date" name="effective_from" value="{{ current_date }}" required />
           </div>
           <div class="col-12">
-            <button class="btn btn-indigo w-100">
-              <i class="bi bi-plus-lg me-1"></i> Add New Electricity Rate
+            <button class="btn btn-primary w-100" type="submit">
+              Add New Electricity Rate
             </button>
           </div>
         </form>
       </div>
+
+      <!-- RATE HISTORY TABLE -->
+      <div class="border-top">
+        <div class="p-3 bg-light border-bottom">
+          <span class="form-label mb-0" style="font-weight: 600;">Rate Tariff History</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table-nivara">
+            <thead>
+              <tr>
+                <th>Rate / Unit</th>
+                <th>Effective From</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in rates %}
+              <tr>
+                <td class="fw-semibold text-primary-dark">{{ r.rate_per_unit|money }}</td>
+                <td>{{ r.effective_from }}</td>
+                <td>
+                  {% if not r.effective_to %}
+                    <span class="badge-status badge-status-success"><span class="badge-dot"></span> Active</span>
+                  {% else %}
+                    <span class="text-muted small">Until {{ r.effective_to }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="3" class="text-center text-muted py-3">No rates configured yet.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- RATE HISTORY -->
-    <div class="card shadow-sm mb-4">
-      <div class="card-header bg-light">
-        <i class="bi bi-history me-2"></i>Electricity Rate History
+    <!-- CHANGE PASSWORD -->
+    <div class="card-nivara">
+      <div class="card-nivara-header">
+        <h3 class="card-nivara-title">
+          <i class="bi bi-shield-lock text-secondary"></i>
+          <span>Change Administrator Password</span>
+        </h3>
       </div>
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Rate / Unit</th>
-              <th>Effective From</th>
-              <th>Effective To</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for r in rates %}
-            <tr>
-              <td class="fw-bold text-dark">{{ r.rate_per_unit|money }}</td>
-              <td>{{ r.effective_from }}</td>
-              <td>
-                {% if not r.effective_to %}
-                <span class="badge badge-soft-success">CURRENT</span>
-                {% else %}
-                {{ r.effective_to }}
-                {% endif %}
-              </td>
-            </tr>
-            {% else %}
-            <tr>
-              <td colspan="3" class="text-center text-secondary py-3">No rates configured yet.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- CHANGE ADMIN PASSWORD -->
-    <div class="card shadow-sm">
-      <div class="card-header bg-light">
-        <i class="bi bi-shield-lock-fill me-2 text-danger"></i>Change Admin Password
-      </div>
-      <div class="card-body">
+      <div class="card-nivara-body">
         <form method="post">
           <input type="hidden" name="action" value="password" />
-          <div class="mb-3">
+          <div class="form-group mb-3">
             <label class="form-label">Current Password</label>
-            <input
-              class="form-control"
-              type="password"
-              name="current_password"
-              required
-            />
+            <input class="form-control" type="password" name="current_password" required />
           </div>
-          <div class="mb-4">
-            <label class="form-label">New Password (Min 8 characters)</label>
-            <input
-              class="form-control"
-              type="password"
-              name="new_password"
-              minlength="8"
-              required
-            />
+          <div class="form-group mb-3">
+            <label class="form-label">New Password</label>
+            <input class="form-control" type="password" name="new_password" minlength="8" placeholder="Minimum 8 characters" required />
           </div>
-          <button class="btn btn-outline-dark w-100">
-            <i class="bi bi-key me-1"></i> Update Security Credentials
+          <button class="btn btn-secondary w-100" type="submit">
+            Update Admin Password
           </button>
         </form>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

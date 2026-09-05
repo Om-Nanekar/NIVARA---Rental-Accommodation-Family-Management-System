@@ -1,147 +1,150 @@
 {% extends 'base.html' %} 
 
-{% block title %}Families{% endblock %} 
+{% block title %}Tenants{% endblock %} 
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+
+<!-- PAGE HEADER -->
+<div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
   <div>
-    <h1 class="h3 fw-bold mb-1">Family Allocation</h1>
-    <p class="text-secondary small mb-0">
-      Assign tenant families to available rooms and track household members.
-    </p>
+    <h1 class="page-title">Tenants & Allocations</h1>
+    <p class="page-subtitle">Allocate available rooms to tenant families and track household members.</p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#allocateTenantCollapse" aria-expanded="false" aria-controls="allocateTenantCollapse" {% if not rooms %}disabled{% endif %}>
+      <i class="bi bi-person-plus"></i>
+      <span>Allocate Tenant</span>
+    </button>
   </div>
 </div>
 
-<!-- ALLOCATE ROOM CARD -->
-<div class="card mb-4 shadow-sm">
-  <div class="card-header bg-light">
-    <i class="bi bi-house-add-fill me-2 text-indigo"></i>Allocate Room to New Family
-  </div>
-  <div class="card-body">
-    <form method="post" id="familyForm">
-      <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Select Available Room</label>
-          <select class="form-select" name="room_id" id="room_id" required>
-            {% for r in rooms %}
-            <option value="{{ r.room_id }}" data-capacity="{{ r.capacity }}">
-              Room {{ r.room_number }} (Cap: {{ r.capacity }} · {{ r.current_rent|money }}/mo)
-            </option>
-            {% else %}
-            <option disabled selected>No available rooms for allocation</option>
-            {% endfor %}
-          </select>
-          <div class="form-text mt-1 text-primary fw-medium" id="capacityNote"></div>
-        </div>
+<!-- ALLOCATE TENANT FORM COLLAPSIBLE -->
+<div class="collapse mb-4" id="allocateTenantCollapse">
+  <div class="card-nivara">
+    <div class="card-nivara-header">
+      <h3 class="card-nivara-title">
+        <i class="bi bi-house-add text-primary"></i>
+        <span>Allocate Room to Family</span>
+      </h3>
+    </div>
+    <div class="card-nivara-body">
+      <form method="post" id="familyForm">
+        <div class="row g-3">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Available Room</label>
+            <select class="form-select" name="room_id" id="room_id" required>
+              {% for r in rooms %}
+              <option value="{{ r.room_id }}" data-capacity="{{ r.capacity }}">
+                Room {{ r.room_number }} (Cap: {{ r.capacity }} · {{ r.current_rent|money }}/mo)
+              </option>
+              {% else %}
+              <option disabled selected>No available rooms</option>
+              {% endfor %}
+            </select>
+            <div class="form-text" id="capacityNote"></div>
+          </div>
 
-        <div class="col-md-4">
-          <label class="form-label">Family Head Name</label>
-          <input
-            class="form-control"
-            name="head_name"
-            placeholder="Primary tenant name"
-            maxlength="100"
-            required
-          />
-        </div>
+          <div class="col-12 col-sm-6 col-md-4">
+            <label class="form-label">Family Head Full Name</label>
+            <input class="form-control" name="head_name" placeholder="Primary tenant name" maxlength="100" required />
+          </div>
 
-        <div class="col-md-4">
-          <label class="form-label">Family Head Mobile</label>
-          <input
-            class="form-control"
-            name="head_phone"
-            placeholder="10-digit mobile number"
-            maxlength="15"
-            required
-          />
-        </div>
+          <div class="col-12 col-sm-6 col-md-4">
+            <label class="form-label">Contact Mobile Number</label>
+            <input class="form-control" name="head_phone" placeholder="e.g. 9876543210" maxlength="15" required />
+          </div>
 
-        <div class="col-md-4">
-          <label class="form-label">Move-in Date</label>
-          <input
-            class="form-control"
-            type="date"
-            name="move_in_date"
-            value="{{ current_date }}"
-            required
-          />
-        </div>
+          <div class="col-12 col-sm-6 col-md-4">
+            <label class="form-label">Move-in Date</label>
+            <input class="form-control" type="date" name="move_in_date" value="{{ current_date }}" required />
+          </div>
 
-        <div class="col-12">
-          <div class="p-3 bg-light rounded-3 border">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <label class="form-label mb-0 fw-semibold text-dark">
-                <i class="bi bi-people me-1"></i> Additional Family Members
-              </label>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-dark"
-                id="addMember"
-              >
-                <i class="bi bi-plus-circle me-1"></i> Add Member
-              </button>
-            </div>
-            <div id="members"></div>
-            <div class="form-text small text-muted">
-              Note: The family head is automatically counted as member #1.
+          <!-- DYNAMIC HOUSEHOLD MEMBERS -->
+          <div class="col-12">
+            <div class="p-3 bg-light rounded border">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="form-label mb-0" style="font-weight: 600;">Additional Family Members</span>
+                <button type="button" class="btn btn-secondary btn-sm" id="addMember">
+                  <i class="bi bi-plus-lg"></i>
+                  <span>Add Member</span>
+                </button>
+              </div>
+              <div id="members"></div>
+              <div class="form-text">
+                The family head is automatically counted as member #1. Add other household residents above.
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 text-end">
-          <button class="btn btn-indigo px-4" {% if not rooms %}disabled{% endif %}>
-            <i class="bi bi-check2-circle me-1"></i> Allocate Family
-          </button>
+          <div class="col-12 d-flex justify-content-end gap-2 pt-2">
+            <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#allocateTenantCollapse">Cancel</button>
+            <button class="btn btn-primary" type="submit" {% if not rooms %}disabled{% endif %}>
+              Confirm Allocation
+            </button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- ACTIVE FAMILIES TABLE -->
-<div class="card shadow-sm">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-people me-2"></i>Active Tenant Families</span>
-    <span class="badge badge-soft-secondary">{{ families|length }} Active Families</span>
+<!-- ACTIVE TENANTS REGISTER -->
+<div class="card-nivara">
+  <div class="card-nivara-header">
+    <h3 class="card-nivara-title">
+      <i class="bi bi-people text-secondary"></i>
+      <span>Active Tenant Families</span>
+    </h3>
+    <span class="badge-status badge-status-neutral">{{ families|length }} Active</span>
   </div>
+
+  <!-- FILTER TOOLBAR -->
+  <div class="p-3 border-bottom bg-light d-flex flex-wrap gap-2 justify-content-between align-items-center">
+    <div class="search-input-wrapper">
+      <i class="bi bi-search"></i>
+      <input type="text" class="form-control" id="tenantSearchInput" placeholder="Search tenant by name, phone or room..." />
+    </div>
+  </div>
+
   <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
+    <table class="table-nivara" id="tenantsTable">
       <thead>
         <tr>
           <th>Family Head</th>
-          <th>Mobile Number</th>
-          <th>Allocated Room</th>
-          <th>Total Members</th>
+          <th>Contact Phone</th>
+          <th>Room</th>
+          <th>Members</th>
           <th>Move-in Date</th>
-          <th class="text-end">Action</th>
+          <th style="text-align: right;">Action</th>
         </tr>
       </thead>
       <tbody>
         {% for f in families %}
-        <tr>
-          <td class="fw-bold text-dark"><i class="bi bi-person-circle me-2 text-secondary"></i>{{ f.head_name }}</td>
-          <td><i class="bi bi-telephone me-1 text-muted"></i>{{ f.head_phone }}</td>
-          <td><span class="badge badge-soft-primary">Room {{ f.room_number }}</span></td>
-          <td><i class="bi bi-people me-1 text-muted"></i>{{ f.member_count }} person(s)</td>
+        <tr class="tenant-row">
+          <td class="fw-semibold text-primary-dark">
+            <i class="bi bi-person-fill text-muted me-1"></i>{{ f.head_name }}
+          </td>
+          <td>{{ f.head_phone }}</td>
+          <td><span class="badge-status badge-status-neutral">Room {{ f.room_number }}</span></td>
+          <td>{{ f.member_count }} person(s)</td>
           <td>{{ f.move_in_date }}</td>
-          <td class="text-end">
-            <form
-              method="post"
-              action="{{ url_for('checkout_family', family_id=f.family_id) }}"
-              data-confirm="Are you sure you want to check out this family? Any outstanding unpaid bills will block checkout."
-              class="d-inline"
-            >
-              <button class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-box-arrow-right me-1"></i> Checkout
+          <td style="text-align: right;">
+            <form method="post" action="{{ url_for('checkout_family', family_id=f.family_id) }}" data-confirm="Are you sure you want to check out this family? Outstanding unpaid bills will block checkout." class="d-inline">
+              <button class="btn btn-danger-outline btn-sm" type="submit">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Checkout</span>
               </button>
             </form>
           </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="6" class="text-center text-secondary py-5">
-            <i class="bi bi-people fs-2 text-muted d-block mb-2"></i>
-            No active tenant families currently registered.
+          <td colspan="6">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="bi bi-people"></i></div>
+              <div class="empty-state-title">No active tenant families</div>
+              <div class="empty-state-desc">Allocate an available room to a family to begin tenancy and cycle billing.</div>
+            </div>
           </td>
         </tr>
         {% endfor %}
@@ -149,6 +152,7 @@
     </table>
   </div>
 </div>
+
 {% endblock %} 
 
 {% block scripts %}

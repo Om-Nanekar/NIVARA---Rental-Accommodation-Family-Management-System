@@ -1,53 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin Sign In{% endblock %}
+{% block title %}Sign In{% endblock %}
 
 {% block auth_content %}
-<div class="auth-page">
-  <div class="card auth-card">
-    <div class="card-body p-4 p-md-5">
-      <div class="text-center mb-4">
-        <img src="{{ url_for('static', filename='images/Main_logo.svg') }}" alt="Main Logo" style="height: 56px; width: auto;" class="mb-3">
-        <h1 class="h3 fw-bold text-dark mb-1">NIVARA Admin</h1>
-        <p class="text-secondary small mb-0">Rental Accommodation & Family Management</p>
-      </div>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-      <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show rounded-3 small">
-        <i class="bi bi-exclamation-circle-fill me-1"></i> {{ message }}
-      </div>
-      {% endfor %}
-      {% endwith %}
-
-      <form method="post" autocomplete="off">
-        <div class="mb-3">
-          <label class="form-label">Username</label>
-          <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="bi bi-person"></i></span>
-            <input class="form-control" name="username" placeholder="Admin username" required autofocus />
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label">Password</label>
-          <div class="input-group">
-            <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
-            <input
-              type="password"
-              class="form-control"
-              name="password"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-        </div>
-
-        <button class="btn btn-indigo w-100 py-2 fs-6 shadow-sm">
-          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Dashboard
-        </button>
-      </form>
+<div class="auth-wrapper">
+  <div class="auth-box">
+    <div class="auth-brand">
+      <h1 class="auth-title">NIVARA</h1>
+      <p class="auth-subtitle">Rental Accommodation Management</p>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert-nivara alert-nivara-danger mb-3" role="alert">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span class="flex-grow-1">{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post" autocomplete="off">
+      <div class="form-group mb-3">
+        <label class="form-label">Username</label>
+        <input class="form-control" name="username" placeholder="Admin username" required autofocus />
+      </div>
+
+      <div class="form-group mb-4">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" placeholder="••••••••" required />
+      </div>
+
+      <button class="btn btn-primary w-100" type="submit">
+        Sign in to Dashboard
+      </button>
+    </form>
   </div>
 </div>
 {% endblock %}
